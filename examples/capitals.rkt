@@ -203,10 +203,19 @@
     ("Zambia" "Lusaka")
     ("Zimbabwe" "Harare")))
 
+;; Augment the search box to exit when pressing Escape
+(define (mtext-field%% tf%)
+  (class tf% (super-new)
+    (define/override (on-subwindow-char tf ev)
+      (case (send ev get-key-code)
+        [(escape) (send fr show #f)]
+        [else (super on-subwindow-char tf ev)]))))
+
 (define fr (new frame% [label ""]))
 (define slb (new search-list-box%
                  [parent fr]
                  [label "Type part of a country name then press Enter:"]
+                 [text-field-mixin mtext-field%%] ; augment the text-field
                  [contents capitals]
                  [key first]
                  [min-width 200]

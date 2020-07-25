@@ -11,7 +11,8 @@
 
 @defmodule[search-list-box]
 
-A @racket[list-box%] with a search @racket[text-field%].
+A @racket[list-box%] with a search @racket[text-field%]. See some examples
+@hyperlink["https://github.com/Metaxal/search-list-box/tree/master/examples"]{here}.
 
 @(bitmap search-list-box-png)
 
@@ -39,10 +40,10 @@ Moreover, it has the following additional contracts:
                                                  (is-a?/c panel%)
                                                  (is-a?/c pane%))]
                         [label             (or/c label-string? #f)]
-                        [text-field-mixin  (-> (is-a?/c text-field%)
-                                               (is-a?/c text-field%))]
-                        [list-box-mixin    (-> (is-a?/c list-box%)
-                                               (is-a?/c list-box%))]
+                        [text-field-mixin  (-> (subclass?/c text-field%)
+                                               (subclass?/c text-field%))]
+                        [list-box-mixin    (-> (subclass?/c list-box%)
+                                               (subclass?/c list-box%))]
                         [filter            (-> string? label-string? any/c)]
                         [key               (-> any/c string?)]
                         [callback          (-> (or/c number? #f)
