@@ -60,8 +60,13 @@
                                       (is-a?/c list-box%))]
                [filter            (-> string? label-string? any/c)]
                [key               (-> any/c string?)]
-               [callback          (-> (or/c number? #f) (or/c label-string? #f) any/c any)]
-               #;[style ]))
+               [callback          (-> (or/c number? #f) (or/c label-string? #f) any/c any)])
+   [focus (-> any)]
+   [get-list-box (->m (is-a?/c list-box%))]
+   [get-text-field (->m (is-a?/c text-field%))]
+   [set-contents (->m list? any)]
+   [set-text (->m label-string? any)])
+  
   (class vertical-panel%
     (init-field parent
                 [label #f]
