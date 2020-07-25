@@ -2,8 +2,9 @@
 
 (require search-list-box)
 
-;; The data can be a list of anything,
-;; as long as the `key` argument is provided.
+;;; This example demonstrates how to use `contents` that are more than strings,
+;;; as well as augmenting the text-field with a mixin so as to exit when Escape is pressed
+;;; in the text-field.
 
 (define capitals
   '(("Afghanistan" "Kabul")
