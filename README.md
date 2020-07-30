@@ -1,7 +1,7 @@
 search-list-box
 ===============
 
-A `list-box%` with a search field.
+A `list-box%` with a search field. See the [docs](https://docs.racket-lang.org/search-list-box/).
 
 ![](img/search-list-box.png)
 
