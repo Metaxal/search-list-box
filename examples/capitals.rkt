@@ -225,6 +225,7 @@
                              (when idx
                                (message-box "Information"
                                             (format "The capital of ~a is ~a"
-                                                    (first content) (second content)))))]))
+                                                    (first content) (second content))
+                                            fr)))]))
 (send fr show #t)
 (send slb focus)

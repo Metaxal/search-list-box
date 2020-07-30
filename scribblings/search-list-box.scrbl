@@ -1,8 +1,9 @@
 #lang scribble/manual
-@require[@for-label[search-list-box
-                    racket/gui]
-         racket/runtime-path
-         pict]
+@(require (for-label search-list-box
+                     racket/gui)
+          scribble/extract
+          racket/runtime-path
+          pict)
 
 @(define-runtime-path search-list-box-png "../img/search-list-box.png")
 
@@ -11,10 +12,11 @@
 
 @defmodule[search-list-box]
 
+
 A @racket[list-box%] with a search @racket[text-field%]. See some examples
 @hyperlink["https://github.com/Metaxal/search-list-box/tree/master/examples"]{here}.
 
-@(bitmap search-list-box-png)
+@(centered (bitmap search-list-box-png))
 
 Features:
 @itemlist[
@@ -24,37 +26,68 @@ Features:
  @item{Pressing Escape in the list-box returns to the text-field.}
  @item{The filter function can be customized.}]
 
+@defclass[search-list-box-frame% frame% ()]{
+ @defconstructor[([width (or/c dimension-integer? #f) 400]
+                  [height (or/c dimension-integer? #f) 400]
+                  [contents list? '()]
+                  [filter (-> string? label-string? any/c) default-filter]
+                  [key (-> any/c string?) ~a]
+                  [callback
+                   (-> (or/c number? #f)
+                       (or/c label-string? #f)
+                       any/c
+                       any)
+                   (λ (idx label content) (void))]
+                  [close-on-escape? boolean? #t]
+                  [show? boolean? #t])]{
+Creates a simple frame that contains a single @racket[search-list-box%].
+See @racket[search-list-box%] and @racket[frame%] for a description of the arguments;
+All the initialization arguments of @racket[frame%] are also available.
 
+Minimal example:
+@codeblock|{
+#lang racket
+(require search-list-box)
 
-A @racket[search-list-box%] derives from a @racket[vertical-panel%], and thus accepts all the same
-arguments.
+(new search-list-box-frame%
+     [label "Searching..."]
+     [contents '(1 2 3 a1 a2 aa2 bb2 bb3)]
+     [callback (λ (idx label content)
+                 (if idx
+                   (writeln content)
+                   (displayln "No content selected")))])
+}|}}
 
-Moreover, it has the following additional contracts:
-@defform[(search-list-box%)
-         #:contracts
-         ([search-list-box%
-           (class/c
-            (init       [contents          list?])
-            (init-field [parent            (or/c (is-a?/c frame%)
-                                                 (is-a?/c dialog%)
-                                                 (is-a?/c panel%)
-                                                 (is-a?/c pane%))]
-                        [label             (or/c label-string? #f)]
-                        [text-field-mixin  (-> (subclass?/c text-field%)
-                                               (subclass?/c text-field%))]
-                        [list-box-mixin    (-> (subclass?/c list-box%)
-                                               (subclass?/c list-box%))]
-                        [filter            (-> string? label-string? any/c)]
-                        [key               (-> any/c string?)]
-                        [callback          (-> (or/c number? #f)
-                                               (or/c label-string? #f)
-                                               any/c
-                                               any)])
-            [focus          (->m any)]
-            [get-list-box   (->m (is-a?/c list-box%))]
-            [get-text-field (->m (is-a?/c text-field%))]
-            [set-contents   (->m list? any)]
-            [set-text       (->m label-string? any)])])]
+@defclass[search-list-box% vertical-panel% ()]{
+
+ @defconstructor[([label (or/c label-string? #f) #f]
+                  [text-field-mixin
+                   (-> (subclass?/c text-field%)
+                       (subclass?/c text-field%))
+                   (λ (x) x)]
+                  [list-box-mixin
+                   (-> (subclass?/c list-box%)
+                       (subclass?/c list-box%))
+                   (λ (x) x)]
+                  [filter
+                   (-> string? label-string? any/c)
+                   default-filter]
+                  [key
+                   (-> any/c string?)
+                   ~a]
+                  [callback
+                   (-> (or/c number? #f)
+                       (or/c label-string? #f)
+                       any/c
+                       any)
+                   (λ (idx label content) (void))]
+                  [close-on-escape
+                   (or/c #f
+                         (is-a?/c frame%)
+                         (is-a?/c dialog%))
+                   #f])]{
+The @racket[search-list-box%] constructor also accepts all optional arguments
+  of @racket[vertical-panel%].
 
 The @racketid[key] argument builds a label string from a element of @racketid[contents].
 By default is just displays the elements of @racketid[contents] as a string.
@@ -65,21 +98,27 @@ none is selected), the corresponding displayed label-string and the correspondin
 
 The @racketid[filter] argument allows the user to replace the default filter.
 
+If a @racket[frame%] or @racket[dialog%] is passed to @racketid[close-on-escape],
+then upon pressing @racketid[escape] in the text-field the frame or dialog is closed.
+}
 
-Minimal example:
-@codeblock|{
-#lang racket/gui
+ @defmethod[(get-list-box) (is-a?/c list-box%)]{
+ Returns the internal @racket[list-box%].}
+ @defmethod[(get-text-field) (is-a?/c text-field%)]{
+ Returns the internal @racket[text-field%].}
+ @defmethod[(set-text [str string?]) void?]{
+ Sets the text in the @racket[text-field%] to @racketid[str].}
+ @defmethod[(set-contents [conts list?]) void?]{
+ Replaces the current contents of the list box with @racketid[conts].
+ The @racketid[key] and @racketid[filter] are not changed.}
+}
 
-(require search-list-box)
+@defproc[(default-filter [str string?] [lbl label-string?]) any/c]{
+ Equivalent to
+ @racketblock[
+ (string-contains?
+  (string-downcase str)
+  (string-downcase search))]}
 
-(define fr (new frame% [label ""]))
-(define slb (new search-list-box%
-                 [parent fr]
-                 [contents '(1 2 3 a1 a2 aa2 bb2 bb3)]
-                 [min-height 200]
-                 [callback (λ (idx label content)
-                             (writeln content))]))
 
-(send fr show #t)
-(send slb focus)}|
 

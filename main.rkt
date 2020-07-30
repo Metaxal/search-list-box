@@ -1,14 +1,67 @@
 #lang racket/gui
 
-(provide search-list-box%)
+(provide
+ (contract-out
+  
+  [default-filter (-> string? label-string? any/c)]
+  
+  [search-list-box-frame%
+   (class/c
+    (init [parent            (or/c (is-a?/c frame%)
+                                   (is-a?/c dialog%)
+                                   (is-a?/c panel%)
+                                   (is-a?/c pane%))]
+          [width             (or/c dimension-integer? #f)]
+          [height            (or/c dimension-integer? #f)]
+          [contents          list?]
+          [filter            (-> string? label-string? any/c)]
+          [key               (-> any/c string?)]
+          [callback          (-> (or/c number? #f)
+                                 (or/c label-string? #f)
+                                 any/c
+                                 any)]
+          [close-on-escape?  boolean?]
+          [show?             boolean?]))]
+  
+  [search-list-box%
+   (class/c
+    (init       [contents          list?])
+    (init-field [label             (or/c label-string? #f)]
+                [text-field-mixin  (-> (subclass?/c text-field%)
+                                       (subclass?/c text-field%))]
+                [list-box-mixin    (-> (subclass?/c list-box%)
+                                       (subclass?/c list-box%))]
+                [filter            (-> string? label-string? any/c)]
+                [key               (-> any/c string?)]
+                [callback          (-> (or/c number? #f)
+                                       (or/c label-string? #f)
+                                       any/c
+                                       any)]
+                [close-on-escape   (or/c #f
+                                         (is-a?/c frame%)
+                                         (is-a?/c dialog%))])
+    [focus          (->m any)]
+    [get-list-box   (->m (is-a?/c list-box%))]
+    [get-text-field (->m (is-a?/c text-field%))]
+    [set-contents   (->m list? any)]
+    [set-text       (->m label-string? any)])]))
+
+(define (default-filter search str)
+  (string-contains?
+   (string-downcase str)
+   (string-downcase search)))
 
 (define mtext-field%
   (class text-field%
-    (init-field [the-list-box #f])
+    (init-field [the-list-box #f]
+                [close-on-escape #f])
     (define/override (on-subwindow-char tf ev)
       (case (send ev get-key-code)
         [(#\return) (send the-list-box on-return)]
         [(down)     (send the-list-box focus)] ; go into the list box
+        [(escape)   (if close-on-escape
+                      (send close-on-escape show #f)
+                      (super on-subwindow-char tf ev))]
         [else       (super on-subwindow-char tf ev)]))
     (super-new)))
 
@@ -48,43 +101,16 @@
                  (case (send ev get-event-type)
                    [(list-box-dclick) (on-return)]))])))
 
-(define/contract search-list-box%
-  (class/c
-   (init       [contents          list?])
-   (init-field [parent            (or/c (is-a?/c frame%)
-                                        (is-a?/c dialog%)
-                                        (is-a?/c panel%)
-                                        (is-a?/c pane%))]
-               [label             (or/c label-string? #f)]
-               [text-field-mixin  (-> (subclass?/c text-field%)
-                                      (subclass?/c text-field%))]
-               [list-box-mixin    (-> (subclass?/c list-box%)
-                                      (subclass?/c list-box%))]
-               [filter            (-> string? label-string? any/c)]
-               [key               (-> any/c string?)]
-               [callback          (-> (or/c number? #f)
-                                      (or/c label-string? #f)
-                                      any/c
-                                      any)])
-   [focus          (->m any)]
-   [get-list-box   (->m (is-a?/c list-box%))]
-   [get-text-field (->m (is-a?/c text-field%))]
-   [set-contents   (->m list? any)]
-   [set-text       (->m label-string? any)])
-  
+(define search-list-box%
   (class vertical-panel%
-    (init-field parent
-                [label #f]
+    (init-field [label #f]
                 [text-field-mixin (λ (x) x)]
                 [list-box-mixin (λ (x) x)]
-                [(filt? filter)
-                 (λ (search str)
-                   (string-contains?
-                    (string-downcase str)
-                    (string-downcase search)))]
+                [(filt? filter) default-filter]
                 [key ~a] ; Take a content and turn it into a string
                 #;[style '()] ; the text-field style 
-                [callback (λ (idx label content) (void))])
+                [callback (λ (idx label content) (void))]
+                [close-on-escape #f])
     (init [(init-contents contents) '()])
 
     (define contents #())
@@ -126,7 +152,8 @@
            (super on-subwindow-char receiver ev))]
         [else (super on-subwindow-char receiver ev)]))
 
-    (super-new [parent parent])
+    ;;; Initialization
+    (super-new)
     (when label
       (new message%
            [parent this]
@@ -138,7 +165,8 @@
            [callback (λ (tf ev)
                        (case (send ev get-event-type)
                          [(text-field)
-                          (update-list-box)]))]))
+                          (update-list-box)]))]
+           [close-on-escape close-on-escape]))
     (define lb
       (new mlist-box%
            [parent this]
@@ -152,3 +180,25 @@
     (set-contents init-contents)
     (send tf focus)
     ))
+
+(define search-list-box-frame%
+  (class frame%
+    (init [width 400] [height 400]
+          [contents '()]
+          [key ~a]
+          [[afilter filter] default-filter]
+          [callback (λ (idx label content) (void))]
+          [close-on-escape? #t]
+          [show? #t])
+
+    (define (get-search-list-box) slb)
+
+    (super-new [width width] [height height])
+    (define slb (new search-list-box% [parent this]
+                     [contents contents]
+                     [key key]
+                     [filter afilter]
+                     [callback callback]
+                     [close-on-escape (and close-on-escape? this)]))
+    (send this show show?)
+    (send slb focus)))
