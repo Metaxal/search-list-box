@@ -27,7 +27,8 @@ Features:
  @item{The filter function can be customized.}]
 
 @defclass[search-list-box-frame% frame% ()]{
- @defconstructor[([width (or/c dimension-integer? #f) 400]
+ @defconstructor[([message (or/c label-string? #f) #f]
+                  [width (or/c dimension-integer? #f) 400]
                   [height (or/c dimension-integer? #f) 400]
                   [contents list? '()]
                   [filter (-> string? label-string? any/c) default-filter]
@@ -43,6 +44,8 @@ Features:
 Creates a simple frame that contains a single @racket[search-list-box%].
 See @racket[search-list-box%] and @racket[frame%] for a description of the arguments;
 All the initialization arguments of @racket[frame%] are also available.
+The argument @racketid[message] is the label for the @racket[text-field%], whereas
+the argument @racketid[label] is the label for the @racket[frame%].
 
 Minimal example:
 @codeblock|{
@@ -56,7 +59,10 @@ Minimal example:
                  (if idx
                    (writeln content)
                    (displayln "No content selected")))])
-}|}}
+}|}
+
+@defmethod[(get-search-list-box) (is-a?/c search-list-box%)]{
+Returns the @racket[search-list-box%] contained in the frame.}}
 
 @defclass[search-list-box% vertical-panel% ()]{
 

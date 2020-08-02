@@ -7,11 +7,7 @@
   
   [search-list-box-frame%
    (class/c
-    (init [parent            (or/c (is-a?/c frame%)
-                                   (is-a?/c dialog%)
-                                   (is-a?/c panel%)
-                                   (is-a?/c pane%))]
-          [width             (or/c dimension-integer? #f)]
+    (init [width             (or/c dimension-integer? #f)]
           [height            (or/c dimension-integer? #f)]
           [contents          list?]
           [filter            (-> string? label-string? any/c)]
@@ -25,7 +21,8 @@
   
   [search-list-box%
    (class/c
-    (init       [contents          list?])
+    (init       [contents          list?]
+                [message           (or/c label-string? #f)])
     (init-field [label             (or/c label-string? #f)]
                 [text-field-mixin  (-> (subclass?/c text-field%)
                                        (subclass?/c text-field%))]
@@ -183,7 +180,8 @@
 
 (define search-list-box-frame%
   (class frame%
-    (init [width 400] [height 400]
+    (init [message #f]
+          [width 400] [height 400]
           [contents '()]
           [key ~a]
           [[afilter filter] default-filter]
@@ -191,10 +189,11 @@
           [close-on-escape? #t]
           [show? #t])
 
-    (define (get-search-list-box) slb)
+    (define/public (get-search-list-box) slb)
 
     (super-new [width width] [height height])
     (define slb (new search-list-box% [parent this]
+                     [label message]
                      [contents contents]
                      [key key]
                      [filter afilter]
