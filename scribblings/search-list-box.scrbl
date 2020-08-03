@@ -3,9 +3,11 @@
                      racket/gui)
           scribble/extract
           racket/runtime-path
+          racket/file
           pict)
 
-@(define-runtime-path search-list-box-png "../img/search-list-box.png")
+@(define-runtime-path search-list-box.png "../img/search-list-box.png")
+@(define-runtime-path minimal.rkt "../examples/minimal.rkt")
 
 @title{Search-list-box}
 @author{Laurent Orseau}
@@ -16,7 +18,7 @@
 A @racket[list-box%] with a search @racket[text-field%]. See some examples
 @hyperlink["https://github.com/Metaxal/search-list-box/tree/master/examples"]{here}.
 
-@(centered (bitmap search-list-box-png))
+@(centered (bitmap search-list-box.png))
 
 Features:
 @itemlist[
@@ -48,19 +50,8 @@ The argument @racketid[message] is the label for the @racket[text-field%], where
 the argument @racketid[label] is the label for the @racket[frame%].
 
 Minimal example:
-@codeblock|{
-#lang racket
-(require search-list-box)
-
-(define slb
-  (new search-list-box-frame%
-       [label "Searching..."]
-       [contents '(1 2 3 a1 a2 aa2 bb2 bb3)]
-       [callback (λ (idx label content)
-                   (if idx
-                     (send slb set-status (format "Selected: ~a" content))
-                     (displayln "No content selected")))]))
-}|}
+@(apply typeset-code (list (file->string minimal.rkt)))
+}
 
 @defmethod[(get-search-list-box) (is-a?/c search-list-box%)]{
 Returns the @racket[search-list-box%] contained in the frame.}
