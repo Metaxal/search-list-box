@@ -207,6 +207,7 @@
     (super-new [width width] [height height])
     (define slb (new search-list-box% [parent this]
                      [label message]
+                     [alignment '(left bottom)]
                      [contents contents]
                      [key key]
                      [filter afilter]

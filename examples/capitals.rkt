@@ -204,7 +204,8 @@
 
 (define fr
   (new search-list-box-frame%
-       [label "Type part of a country name then press Enter:"]
+       [label "Capitals of the world"]
+       [message "Type part of a country name then press Enter:"]
        [contents capitals]
        [key first]
        [min-width 200]
