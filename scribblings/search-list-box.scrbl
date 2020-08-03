@@ -52,17 +52,22 @@ Minimal example:
 #lang racket
 (require search-list-box)
 
-(new search-list-box-frame%
-     [label "Searching..."]
-     [contents '(1 2 3 a1 a2 aa2 bb2 bb3)]
-     [callback (λ (idx label content)
-                 (if idx
-                   (writeln content)
-                   (displayln "No content selected")))])
+(define slb
+  (new search-list-box-frame%
+       [label "Searching..."]
+       [contents '(1 2 3 a1 a2 aa2 bb2 bb3)]
+       [callback (λ (idx label content)
+                   (if idx
+                     (send slb set-status (format "Selected: ~a" content))
+                     (displayln "No content selected")))]))
 }|}
 
 @defmethod[(get-search-list-box) (is-a?/c search-list-box%)]{
-Returns the @racket[search-list-box%] contained in the frame.}}
+Returns the @racket[search-list-box%] contained in the frame.}
+
+@defmethod[(set-status [str label-string?]) void?]{
+Sets the status message to @racketid[str].}
+}
 
 @defclass[search-list-box% vertical-panel% ()]{
 

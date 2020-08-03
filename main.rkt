@@ -17,7 +17,9 @@
                                  any/c
                                  any)]
           [close-on-escape?  boolean?]
-          [show?             boolean?]))]
+          [show?             boolean?])
+    [set-status (->m label-string? void?)]
+    [get-search-list-box (->m (is-a?/c search-list-box%))])]
   
   [search-list-box%
    (class/c
@@ -191,6 +193,17 @@
 
     (define/public (get-search-list-box) slb)
 
+    (define/public (set-status str)
+      (send status set-label str))
+
+    (define/override (on-subwindow-focus receiver on?)
+      (when on?
+        (cond
+          [(is-a? receiver text-field%)
+           (set-status "Press Enter to confirm, ↑↓ to navigate, Escape to exit")]
+          [(is-a? receiver list-box%)
+           (set-status "Press Space to confirm, ↑↓ to navigate, Escape to edit text")])))
+
     (super-new [width width] [height height])
     (define slb (new search-list-box% [parent this]
                      [label message]
@@ -199,5 +212,7 @@
                      [filter afilter]
                      [callback callback]
                      [close-on-escape (and close-on-escape? this)]))
+    (define status (new message% [parent this] [label ""] [stretchable-width #t]))
+
     (send this show show?)
     (send slb focus)))

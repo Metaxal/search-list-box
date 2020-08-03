@@ -2,9 +2,7 @@
 
 (require search-list-box)
 
-;;; This example demonstrates how to use `contents` that are more than strings,
-;;; as well as augmenting the text-field with a mixin so as to exit when Escape is pressed
-;;; in the text-field.
+;;; This example demonstrates how to use `contents` that are more than strings.
 
 (define capitals
   '(("Afghanistan" "Kabul")
@@ -204,28 +202,16 @@
     ("Zambia" "Lusaka")
     ("Zimbabwe" "Harare")))
 
-;; Augment the search box to exit when pressing Escape
-(define (mtext-field%% tf%)
-  (class tf% (super-new)
-    (define/override (on-subwindow-char tf ev)
-      (case (send ev get-key-code)
-        [(escape) (send fr show #f)]
-        [else (super on-subwindow-char tf ev)]))))
-
-(define fr (new frame% [label ""]))
-(define slb (new search-list-box%
-                 [parent fr]
-                 [label "Type part of a country name then press Enter:"]
-                 [text-field-mixin mtext-field%%] ; augment the text-field
-                 [contents capitals]
-                 [key first]
-                 [min-width 200]
-                 [min-height 400]
-                 [callback (λ (idx label content)
-                             (when idx
-                               (message-box "Information"
-                                            (format "The capital of ~a is ~a"
-                                                    (first content) (second content))
-                                            fr)))]))
-(send fr show #t)
-(send slb focus)
+(define fr
+  (new search-list-box-frame%
+       [label "Type part of a country name then press Enter:"]
+       [contents capitals]
+       [key first]
+       [min-width 200]
+       [min-height 400]
+       [callback (λ (idx label content)
+                   (when idx
+                     (message-box "Information"
+                                  (format "The capital of ~a is ~a"
+                                          (first content) (second content))
+                                  fr)))]))
