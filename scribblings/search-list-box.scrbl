@@ -120,11 +120,13 @@ then upon pressing @racketid[escape] in the text-field the frame or dialog is cl
  @racketblock[
  (string-contains?
   (string-downcase str)
-  (string-downcase search))]}
+  (string-downcase lbl))]}
 
 @defproc[(word-filter [str string?] [lbl label-string?]) any/c]{
- Splits @racketid[str] into words (space separated), and matches @racketid[lbl]
+ Splits @racket[str] into words (space separated), and matches @racket[lbl]
 against all words in no order, with both strings downcased.}
 
+@defproc[(regexp-filter [str string?] [lbl label-string?]) any/c]{
+ Matches @racket[(string-downcase lbl)] to @racket[(pregexp str)].}
 
 

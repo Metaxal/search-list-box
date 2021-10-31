@@ -6,6 +6,7 @@
   
   [default-filter (-> string? label-string? any/c)]
   [word-filter    (-> string? label-string? any/c)]
+  [regexp-filter  (-> string? label-string? any/c)]
   
   [search-list-box-frame%
    (class/c
@@ -69,6 +70,10 @@
   ([words (map string-downcase (string-split search))]) ; memoized
   (let ([str (string-downcase str)])
     (andmap (λ (wd) (string-contains? str wd)) words)))
+
+(define-filter (regexp-filter search str)
+  ([search-rx (pregexp search)]) ; memoized
+  (regexp-match search-rx (string-downcase str)))
 
 (define mtext-field%
   (class text-field%
