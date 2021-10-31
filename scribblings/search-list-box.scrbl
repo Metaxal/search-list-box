@@ -122,5 +122,9 @@ then upon pressing @racketid[escape] in the text-field the frame or dialog is cl
   (string-downcase str)
   (string-downcase search))]}
 
+@defproc[(word-filter [str string?] [lbl label-string?]) any/c]{
+ Splits @racketid[str] into words (space separated), and matches @racketid[lbl]
+against all words in no order, with both strings downcased.}
+
 
 
