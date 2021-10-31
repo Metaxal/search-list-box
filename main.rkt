@@ -50,7 +50,8 @@
 
 ;; Memoize the transformation applied to `search` so as to avoid
 ;; duplicate work, since the filter is called with the same search
-;; on all yet-unfiltered values of str.
+;; on all yet-unfiltered values of `str`.
+;; the expr... can depend on `search` but should not depend on `str`.
 (define-syntax-parse-rule (define-filter (name search str)
                             ([id expr] ...)
                             body ...)
@@ -63,7 +64,7 @@
         body ...))))
 
 (define-filter (default-filter search str)
-  ([search-down (string-downcase str)]) ; memoized
+  ([search-down (string-downcase search)]) ; memoized
   (string-contains? search-down (string-downcase search)))
 
 (define-filter (word-filter search str)
