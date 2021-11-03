@@ -65,7 +65,7 @@
 
 (define-filter (default-filter search str)
   ([search-down (string-downcase search)]) ; memoized
-  (string-contains? search-down (string-downcase search)))
+  (string-contains? (string-downcase str) search))
 
 (define-filter (word-filter search str)
   ([words (map string-downcase (string-split search))]) ; memoized
