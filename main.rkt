@@ -113,14 +113,18 @@
 
     (define/override (on-subwindow-char lb ev)
       (case (send ev get-key-code)
-        #;[(#\return #;#\space) (on-return)] ; doesn't work
+        [(#\return #\space numpad-enter)
+         (on-return)
+         #t] ; doesn't work?
         [(up)
          (define sel (send lb get-selection))
-         (if (or (not sel) (= 0 sel))
-           (send the-text-field focus)
-           (super on-subwindow-char lb ev))]
-        [(escape) (send the-text-field focus)] ; go back to the search box
-        [else (super on-subwindow-char lb ev)]))
+         (and (or (not sel) (= 0 sel))
+              (send the-text-field focus))]
+        [(escape)
+         (send the-text-field focus)
+         #true] ; go back to the search box
+        [else #false #;(super on-subwindow-char lb ev)]))
+    
     (super-new
      [callback (λ (lb ev)
                  (case (send ev get-event-type)
