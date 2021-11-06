@@ -112,18 +112,21 @@
       (return-callback sel str data))
 
     (define/override (on-subwindow-char lb ev)
+      #;(println (send ev get-key-code))
       (case (send ev get-key-code)
         [(#\return #\space numpad-enter)
          (on-return)
-         #t] ; doesn't work?
+         #t] ; #\return work on linux, but there's no defaut key on Windows
         [(up)
          (define sel (send lb get-selection))
-         (and (or (not sel) (= 0 sel))
-              (send the-text-field focus))]
+         (if (or (not sel) (= 0 sel))
+           (send the-text-field focus)
+           (super on-subwindow-char lb ev))]
         [(escape)
          (send the-text-field focus)
          #true] ; go back to the search box
-        [else #false #;(super on-subwindow-char lb ev)]))
+        [else
+         (super on-subwindow-char lb ev)]))
     
     (super-new
      [callback (λ (lb ev)
