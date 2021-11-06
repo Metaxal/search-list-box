@@ -235,7 +235,12 @@
           [(is-a? receiver text-field%)
            (set-status "Press Enter to confirm, ↑↓ to navigate, Escape to exit")]
           [(is-a? receiver list-box%)
-           (set-status "Press Space to confirm, ↑↓ to navigate, Escape to edit text")])))
+           (set-status "Press Enter to confirm, ↑↓ to navigate, Escape to edit text")])))
+
+    (define/override (on-subwindow-char fr ev)
+      (if (equal? #\return (send ev get-key-code))
+        #false ; do not gobble #\return
+        (super on-subwindow-char fr ev)))
 
     (super-new [width width] [height height])
     (define slb (new search-list-box% [parent this]
