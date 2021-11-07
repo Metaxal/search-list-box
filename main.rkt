@@ -125,8 +125,13 @@
         [(escape)
          (send the-text-field focus)
          #true] ; go back to the search box
+        [(down)
+         (super on-subwindow-char lb ev)]
         [else
-         (super on-subwindow-char lb ev)]))
+         #true
+         ; Don't forward to list-box%, which has its own simple search
+         ; mechanism
+         #;(super on-subwindow-char lb ev)]))
     
     (super-new
      [callback (λ (lb ev)
