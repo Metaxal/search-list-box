@@ -101,7 +101,7 @@
     (define/public (get-selected)
       (define sel (or (send this get-selection)
                       (if (= (send this get-number) 0)
-                        #f
+                        #false
                         0)))
       (define str (and sel (send this get-string sel)))
       (define data (and sel (send this get-data sel)))
@@ -116,7 +116,7 @@
       (case (send ev get-key-code)
         [(#\return #\space numpad-enter)
          (on-return)
-         #t] ; #\return work on linux, but there's no defaut key on Windows
+         #true] ; #\return work on linux, but there's no defaut key on Windows
         [(up)
          (define sel (send lb get-selection))
          (if (or (not sel) (= 0 sel))
@@ -127,10 +127,13 @@
          #true] ; go back to the search box
         [(down)
          (super on-subwindow-char lb ev)]
+        [(scroll wheel-up wheel-down wheel-left wheel-right)
+         ; Forward mouse events.
+         (super on-subwindow-char lb ev)]
         [else
          #true
-         ; Don't forward to list-box%, which has its own simple search
-         ; mechanism
+         ; Don't forward other key press to list-box%,
+         ; to avoid triggering the list-box% simple search mechanism .
          #;(super on-subwindow-char lb ev)]))
     
     (super-new
