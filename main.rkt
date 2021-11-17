@@ -1,5 +1,7 @@
 #lang racket/gui
-(require syntax/parse/define)
+(require syntax/parse/define
+         version-case
+         mischief/shorthand)
 
 (version-case
  [(version< (version) "7.9.0.22")
