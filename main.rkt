@@ -52,9 +52,9 @@
 ;; duplicate work, since the filter is called with the same search
 ;; on all yet-unfiltered values of `str`.
 ;; the expr... can depend on `search` but should not depend on `str`.
-(define-syntax-parse-rule (define-filter (name search str)
-                            ([id expr] ...)
-                            body ...)
+(define-simple-macro (define-filter (name search str)
+                       ([id expr] ...)
+                       body ...)
   (define name
     (let ([search-mem #f] [id #f] ...)
       (λ (search str)
