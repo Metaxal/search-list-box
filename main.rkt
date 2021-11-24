@@ -208,7 +208,7 @@
                           (update-list-box)]))]
            [close-on-escape close-on-escape]))
     (define lb
-      (new mlist-box%
+      (new (list-box-mixin mlist-box%)
            [parent this]
            [label #f]
            [choices '()]
